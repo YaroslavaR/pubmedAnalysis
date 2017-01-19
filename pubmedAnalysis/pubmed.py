@@ -2,7 +2,7 @@ from Bio import Entrez
 Entrez.email = "yaroslava.romanets@uj.edu.pl"
 
 def lookup(query):
-    handle = Entrez.elookup(db='pubmed', 
+    handle = Entrez.esearch(db='pubmed', 
     sort='relevance', 
     retmax='1600',
     retmode='xml', 
