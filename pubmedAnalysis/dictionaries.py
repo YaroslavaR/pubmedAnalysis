@@ -3,15 +3,8 @@ from Bio import Entrez
 Entrez.email = "yaroslava.romanets@uj.edu.pl"
 
 def get_citations_ids_map(id_list):
-  #ids = ''
-  #if (not isinstance(id_list, list)):
   print '============== ID LIST ================'
   print id_list
-  #ids = ','.join(id_list)
-  #print '============== IDS ================'
-  #print ids
-  #else:
-   # ids = id_list
   linked = {}
   for i in range(0, len(id_list)):
     handle = Entrez.elink(dbfrom="pubmed", id=id_list[i], linkname="pubmed_pubmed")
@@ -24,7 +17,6 @@ def get_citations_ids_map(id_list):
     print linked
     print '============== ID ================'
     print id_list[i]
-    #print linked
   return linked
 
 def create_article_year_by_topic_map(query_result):
