@@ -3,26 +3,25 @@ from Bio import Entrez
 Entrez.email = "yaroslava.romanets@uj.edu.pl"
 
 def get_citations_ids_map(id_list):
-  print '============== ID LIST ================'
-  print id_list
+  print('============== ID LIST ================')
+  print(id_list)
   linked = {}
   for i in range(0, len(id_list)):
     handle = Entrez.elink(dbfrom="pubmed", id=id_list[i], linkname="pubmed_pubmed")
     results = Entrez.read(handle)
-    print '============== RESULTS ================'
-    print results
+    print('============== RESULTS ================')
+    print(results)
     handle.close()
     linked[id_list[i]] = [link["Id"] for link in results[0]["LinkSetDb"][0]["Link"]]
-    print '============== LINKED ================'
-    print linked
-    print '============== ID ================'
-    print id_list[i]
+    print('============== LINKED ================')
+    print(linked)
+    print('============== ID ================')
+    print(id_list[i])
   return linked
 
 def create_article_year_by_topic_map(query_result):
     year_by_topic = {}
     for paper in query_result['PubmedArticle']:
-      #print paper
       year = paper['PubmedData']['History'][0]['Year']#['PubMedPubDate']
       if not year in year_by_topic:
         year_by_topic[year] = 1
@@ -32,19 +31,30 @@ def create_article_year_by_topic_map(query_result):
 
 def create_articles_map(query_result):
     articles_map = {}
-    print query_result
+    print(query_result)
     for paper in query_result['PubmedArticle']:
-      #print paper
       attributes_map = {}
       attributes_map['pub_year'] = paper['PubmedData']['History'][0]['Year']
       attributes_map['pub_lang'] = paper['MedlineCitation']['Article']['Language'][0]
       attributes_map['pub_type'] = str(paper['MedlineCitation']['Article']['PublicationTypeList'][0])
       attributes_map['pub_title'] = paper['MedlineCitation']['Article']['ArticleTitle']
+      attributes_map['pub_keywords'] = paper['MedlineCitation']['KeywordList']
       articles_map[str(paper['MedlineCitation']['PMID'])] = attributes_map
-      #res['PubmedArticle'][0]['MedlineCitation']['Article']['Language']
-      #res['PubmedArticle'][0]['MedlineCitation']['Article']['PublicationTypeList'][0]
-      #res['PubmedArticle'][0]['MedlineCitation']['Article']['ArticleTitle']
+    print('=========    MAPMAPMAP     =========')
+    print(articles_map)
     return articles_map
+
+def create_article_year_by_topic_from_map(a_map):
+    year_by_topic = {}
+    for i in a_map:
+      year = a_map[i]['pub_year']
+      if not year in year_by_topic:
+        year_by_topic[year] = 1
+      else:
+        year_by_topic[year] += 1
+    print('=========    YEAR_BY_TOPIC_MAPMAPMAP     =========')
+    print(sort_map_by_keys(year_by_topic))
+    return sort_map_by_keys(year_by_topic)
 
 def create_book_year_by_topic_map(query_result):
     year_by_topic = {}

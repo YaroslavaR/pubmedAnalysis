@@ -8,12 +8,12 @@ def lookup(query,max_returned):
       retmode='xml', 
       term=query,
       usehistory="y")
-    print '========== HANDLE ======='
-    print type(handle)
+    print('========== HANDLE =======')
+    print(type(handle))
     results = Entrez.read(handle)
-    print '=========== RESULTS ======='
-    print type(results)
-    print results
+    print('=========== RESULTS =======')
+    print(type(results))
+    print(results)
     return results
        # print handle.readline().strip()
 
@@ -46,11 +46,11 @@ def get_citations_ids(id_list, webenv):#, query_key):
     # print '============== RESULTS2 ================'
     # print results2
 
-    print '====== LINKS BEFORE ========='
-    print linked
+    print('====== LINKS BEFORE =========')
+    print(linked)
     linked = linked + ([link["Id"] for link in results[0]["LinkSetDb"][0]["Link"]])
-    print '====== LINKS AFTER ========='
-    print linked
+    print('====== LINKS AFTER =========')
+    print(linked)
     #print linked
   return linked
   #results["WebEnv"], results["QueryKey"] 
