@@ -4,10 +4,11 @@ import sys
 from Bio import Entrez
 import time
 from queries import lookup, get_details_by_id, get_citations_ids
-from dictionaries import get_citations_ids_map, \
+from dictionaries import get_citations_ids_map, avg, avg_list, age_of_cited_work, \
     create_articles_map, create_book_year_by_topic_map, sort_map_by_keys, zscore, create_article_year_by_topic_from_map
 from settings import ENTREZ_EMAIL, SEARCH_TERM_1, SEARCH_TERM_2, MAX_RETURNED_TERM_1, MAX_RETURNED_TERM_2
 import ssl
+import numpy as np
 
 
 if __name__ == '__main__':
@@ -45,10 +46,12 @@ if __name__ == '__main__':
 
     start_time = time.time()
     links_ml = get_citations_ids(ml_id_list, ml_webenv)
+    ml_articles_links_map = get_citations_ids_map(ml_id_list, ml_webenv)
     citations_ml = get_details_by_id(links_ml, ml_webenv)
     ml_citations_map = create_articles_map(citations_ml)  
     elapsed_time = time.time() - start_time
     print('====== ML CITATIONS - 160 - ELAPSED TIME =========')
+    print(ml_articles_links_map)
     print(elapsed_time)
 
     cit_ml_dict_sort = create_article_year_by_topic_from_map(ml_citations_map)
@@ -74,24 +77,33 @@ if __name__ == '__main__':
 
     start_time = time.time()
     links_ai = get_citations_ids(ai_id_list, ai_webenv)
+    ai_articles_links_map = get_citations_ids_map(ai_id_list, ai_webenv)
     citations_ai = get_details_by_id(links_ai, ai_webenv)
     ai_citations_map = create_articles_map(citations_ai)
     elapsed_time = time.time() - start_time
     print('====== AI CITATIONS - 670 - ELAPSED TIME =========')
+    print(ai_articles_links_map)
     print(elapsed_time)
 
     cit_ai_dict_sort = create_article_year_by_topic_from_map(ai_citations_map)
     ai_map = create_article_year_by_topic_from_map(ai_papers_map)
+
+    print('=============== ARTICLESSS =================')
+    age_of_cited_work = age_of_cited_work(ai_papers_map, ai_articles_links_map, ai_citations_map)
 
 
     # ====================== PLOTTING ======================
 
     print('=============== PLOT KEYS =================')
     print(list(ai_map.keys()))
+    print(list(cit_ai_dict_sort.keys()))
     print(list(ml_map.keys()))
+    print(list(cit_ml_dict_sort.keys()))
     print('=============== PLOT VALUES =================')
     print(list(ai_map.values()))
+    print(list(cit_ai_dict_sort.values()))
     print(list(ml_map.values()))
+    print(list(cit_ml_dict_sort.values()))
     plt.figure(1)
     plt.subplot(211).xaxis.set_major_formatter(tick.FormatStrFormatter('%0.0f'))
     plt.plot(list(ai_map.keys()),list(ai_map.values()), ':r', label='AI')
@@ -115,7 +127,32 @@ if __name__ == '__main__':
     plt.legend(loc=2)
     plt.show()
 
-    import numpy as np
+    # myList[:] = [x / myInt for x in myList]
+    plt.figure(2)
+    plt.subplot(211).xaxis.set_major_formatter(tick.FormatStrFormatter('%0.0f'))
+    plt.plot(list(cit_ai_dict_sort.keys()),avg(list(cit_ai_dict_sort.values())),':r', label='AI')
+    plt.plot(list(cit_ml_dict_sort.keys()),avg(list(cit_ml_dict_sort.values())),'--c', label='ML')
+    plt.title("Average amount of article citations per year for AI vs for ML")
+    plt.xlabel("Year")
+    plt.ylabel("Average amount of articles");
+    plt.legend(loc=2)
+
+    plt.subplot(212).xaxis.set_major_formatter(tick.FormatStrFormatter('%0.0f'))
+    print(list(age_of_cited_work.keys()))
+    print(avg_list(age_of_cited_work.values()))
+    ind = np.arange(len(age_of_cited_work))
+    plt.bar(ind, avg_list(age_of_cited_work.values()),0.35)#, ':r', label='AI')
+    plt.xticks(ind, list(age_of_cited_work.keys()))
+    plt.title("Average age cited works per year for AI vs for ML")
+    plt.xlabel("Year")
+    plt.ylabel("Age of articles");
+
+    plt.tight_layout(pad=1.0, w_pad=1.0, h_pad=1.0)
+
+    plt.legend(loc=2)
+    plt.show()
+
+    
     
     growth_rate = np.exp(np.diff(np.log(list(ai_map.values())))) - 1
     print(growth_rate)
@@ -126,7 +163,7 @@ if __name__ == '__main__':
     print(len(growth_rate))
     print(len(x))
 
-    plt.figure(2)
+    plt.figure(3)
     plt.subplot(111).xaxis.set_major_formatter(tick.FormatStrFormatter('%0.0f'))
     plt.plot(x,growth_rate)
     plt.show()
