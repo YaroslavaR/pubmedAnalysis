@@ -56,6 +56,7 @@ if __name__ == '__main__':
 
     cit_ml_dict_sort = create_article_year_by_topic_from_map(ml_citations_map)
     ml_map = create_article_year_by_topic_from_map(ml_papers_map)
+    ml_age_of_cited_work = age_of_cited_work(ml_papers_map, ml_articles_links_map, ml_citations_map)
 
 
     # =============== SECOND TERM ARTICLES AND CITATIONS ================
@@ -89,7 +90,7 @@ if __name__ == '__main__':
     ai_map = create_article_year_by_topic_from_map(ai_papers_map)
 
     print('=============== ARTICLESSS =================')
-    age_of_cited_work = age_of_cited_work(ai_papers_map, ai_articles_links_map, ai_citations_map)
+    ai_age_of_cited_work = age_of_cited_work(ai_papers_map, ai_articles_links_map, ai_citations_map)
 
 
     # ====================== PLOTTING ======================
@@ -104,11 +105,11 @@ if __name__ == '__main__':
     print(list(cit_ai_dict_sort.values()))
     print(list(ml_map.values()))
     print(list(cit_ml_dict_sort.values()))
-    plt.figure(1)
+    plt.figure(1, figsize=(10,5))
     plt.subplot(211).xaxis.set_major_formatter(tick.FormatStrFormatter('%0.0f'))
-    plt.plot(list(ai_map.keys()),list(ai_map.values()), ':r', label='AI')
-    plt.plot(list(ml_map.keys()),list(ml_map.values()), '--c', label='ML')
-    plt.title("Amount of articles published about ML and AI per year")
+    plt.plot(list(ai_map.keys()),list(ai_map.values()), ':r', label=SEARCH_TERM_2)
+    plt.plot(list(ml_map.keys()),list(ml_map.values()), '--c', label=SEARCH_TERM_1)
+    plt.title("Amount of articles published about " +  SEARCH_TERM_2 + " and " + SEARCH_TERM_1 + " per year")
     plt.xlabel("Year")
     plt.ylabel("Amount of articles");
 
@@ -116,9 +117,9 @@ if __name__ == '__main__':
     #plt.show()
 
     plt.subplot(212).xaxis.set_major_formatter(tick.FormatStrFormatter('%0.0f'))
-    plt.plot(list(cit_ai_dict_sort.keys()),list(cit_ai_dict_sort.values()), ':r', label='AI')
-    plt.plot(list(cit_ml_dict_sort.keys()),list(cit_ml_dict_sort.values()), '--c', label='ML')
-    plt.title("Amount of article citations per year for AI vs for ML")
+    plt.plot(list(cit_ai_dict_sort.keys()),list(cit_ai_dict_sort.values()), ':r', label=SEARCH_TERM_2)
+    plt.plot(list(cit_ml_dict_sort.keys()),list(cit_ml_dict_sort.values()), '--c', label=SEARCH_TERM_1)
+    plt.title("Amount of article citations per year for " +  SEARCH_TERM_2 + " vs for " + SEARCH_TERM_1)
     plt.xlabel("Year")
     plt.ylabel("Amount of articles");
 
@@ -128,22 +129,24 @@ if __name__ == '__main__':
     plt.show()
 
     # myList[:] = [x / myInt for x in myList]
-    plt.figure(2)
+    plt.figure(2, figsize=(10,5))
     plt.subplot(211).xaxis.set_major_formatter(tick.FormatStrFormatter('%0.0f'))
-    plt.plot(list(cit_ai_dict_sort.keys()),avg(list(cit_ai_dict_sort.values())),':r', label='AI')
-    plt.plot(list(cit_ml_dict_sort.keys()),avg(list(cit_ml_dict_sort.values())),'--c', label='ML')
-    plt.title("Average amount of article citations per year for AI vs for ML")
+    plt.plot(list(cit_ai_dict_sort.keys()),avg(list(cit_ai_dict_sort.values())),':r', label=SEARCH_TERM_2)
+    plt.plot(list(cit_ml_dict_sort.keys()),avg(list(cit_ml_dict_sort.values())),'--c', label=SEARCH_TERM_1)
+    plt.title("Average amount of article citations per year for " +  SEARCH_TERM_2 + " vs for " + SEARCH_TERM_1)
     plt.xlabel("Year")
     plt.ylabel("Average amount of articles");
     plt.legend(loc=2)
 
     plt.subplot(212).xaxis.set_major_formatter(tick.FormatStrFormatter('%0.0f'))
-    print(list(age_of_cited_work.keys()))
-    print(avg_list(age_of_cited_work.values()))
-    ind = np.arange(len(age_of_cited_work))
-    plt.bar(ind, avg_list(age_of_cited_work.values()),0.35)#, ':r', label='AI')
-    plt.xticks(ind, list(age_of_cited_work.keys()))
-    plt.title("Average age cited works per year for AI vs for ML")
+    print(list(ai_age_of_cited_work.keys()))
+    print(avg_list(ai_age_of_cited_work.values()))
+    ind = np.arange(len(ai_age_of_cited_work))
+    plt.bar(ind-0.15, avg_list(ai_age_of_cited_work.values()),0.3, color='r', label=SEARCH_TERM_2)
+    plt.bar(ind+0.15, avg_list(ml_age_of_cited_work.values()), 0.3, color='c', label=SEARCH_TERM_1)
+    #, ':r', label='AI')
+    plt.xticks(ind, list(ai_age_of_cited_work.keys()))
+    plt.title("Average age cited works per year for " +  SEARCH_TERM_2 + " vs for " + SEARCH_TERM_1)
     plt.xlabel("Year")
     plt.ylabel("Age of articles");
 

@@ -102,11 +102,12 @@ def age_of_cited_work(art_map, art_cit_map, cit_map):
       print('========== CITATION ============')
       print(citation)
       print(art_map[article]['pub_year'])
-      print(cit_map[citation]['pub_year'])
-      age_list.append(int(art_map[article]['pub_year']) - int(cit_map[citation]['pub_year']))
-      age[art_map[article]['pub_year']] = age_list
-      print('========== AGE ============')
-      print(age)
+      if citation in cit_map:
+        print(cit_map[citation]['pub_year'])
+        age_list.append(int(art_map[article]['pub_year']) - int(cit_map[citation]['pub_year']))
+        age[art_map[article]['pub_year']] = age_list
+        print('========== AGE ============')
+        print(age)
   return sort_map_by_keys(age)
 
 #def split_keys_into_chunks(id_list):
