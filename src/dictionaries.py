@@ -1,6 +1,41 @@
 from collections import OrderedDict
 from Bio import Entrez
-Entrez.email = "yaroslava.romanets@uj.edu.pl"
+from queries import lookup, get_details_by_id, get_citations_ids
+from settings import ENTREZ_EMAIL
+Entrez.email = ENTREZ_EMAIL
+
+""" Stages:
+        1. lookup(term, max_returned) - search for term in Entrez, return list of Ids (IdList)
+        2. save IdList and WebEnv
+        3. get_details_by_id(IdList, WebEnv) - search for detailed information for each id from IdList, 
+                        return Entrez Parse object
+        4. create_articles_map(get_details_by_id(IdList, WebEnv)) - create articles dictionary, return dictionary
+        5. get_citations_ids(IdList, WebEnv) - get ids of articles referenced by articles from IdList, return IdList
+        6. get_citations_ids_map(IdList, WebEnv) - create dictionary of articles mapped to articles they reference, 
+                        return dictionary
+        7. get_details_by_id(get_citation_ids(IdList, WebEnv), WebEnv) - search for detailed information 
+                        for each id from IdList of citations, return Entrez Parse object
+        8. create_articles_map(get_details_by_id(get_citation_ids(IdList, WebEnv), WebEnv)) - create citations dictionary, 
+                        return dictionary
+"""
+
+"""         
+        9. create_article_year_by_topic_from_map(create_articles_map(get_details_by_id(IdList, WebEnv)))
+        10. create_article_year_by_topic_from_map(create_articles_map(get_details_by_id(get_citation_ids(IdList, WebEnv), WebEnv)))
+        11. age_of_cited_work(create_articles_map(get_details_by_id(IdList, WebEnv)), get_citation_ids_map(IdList, WebEnv), create_articles_map(get_details_by_id(get_citation_ids(IdList, WebEnv), WebEnv)))
+"""
+
+def create_maps(term, max_returned):
+  results = lookup(term, max_returned)
+  id_list = results['IdList']
+  webenv = results["WebEnv"]
+  articles = get_details_by_id(id_list, webenv)
+  articles_dict = create_articles_map(articles)
+  cit_id_list = get_citations_ids(id_list, webenv)
+  articles_links_dict = get_citations_ids_map(id_list, webenv)
+  citations = get_details_by_id(cit_id_list, webenv)
+  citations_dict = create_articles_map(citations)
+  return articles_dict, articles_links_dict, citations_dict
 
 def get_citations_ids_map(id_list, webenv):
   print('============== ID LIST ================')
@@ -71,27 +106,6 @@ def sort_map_by_keys(dictionary):
     d = OrderedDict(sorted(dictionary.items()))
     return d
 
-def avg(slist):  
-    print('========== DICT ============')
-    print(slist)
-    # for i in slist:  
-    #     total = total + i
-    for i in range(0,len(slist)):  
-        slist[i] = float(slist[i])/len(slist)
-    return slist
-
-def avg_list(slist):  
-    print('========== DICT ============')
-    print(slist)
-    rlist = []
-    # for i in slist:  
-    #     total = total + i
-    for elem in slist:
-      rlist.append(sum(elem)/float(len(elem)))
-    slist = rlist
-    print(slist)
-    return slist
-
 def age_of_cited_work(art_map, art_cit_map, cit_map):
   age = {}
   for article in art_cit_map:
@@ -110,8 +124,18 @@ def age_of_cited_work(art_map, art_cit_map, cit_map):
         print(age)
   return sort_map_by_keys(age)
 
-#def split_keys_into_chunks(id_list):
- # for i in range(0, len(id_list), 70):
+def keywords_map(articles_map):
+  keywords_map = {}
+  for article in articles_map:
+    if len(articles_map[article]['pub_keywords']) != 0:
+      keyword_list = articles_map[article]['pub_keywords'][0] # for each element in articles_map[article]['pub_keywords'] list get keyword
+      print(keyword_list)
+      for keyword in keyword_list:
+        if not keyword.lower() in keywords_map:
+          keywords_map[str(keyword).lower()] = 1
+        else:
+          keywords_map[str(keyword).lower()] += 1
+  return keywords_map
 
 from math import sqrt
 
@@ -124,32 +148,3 @@ def zscore(obs, pop):
   std = sqrt(sum(((c - avg) ** 2) for c in pop) / number)
   # Zscore Calculation.
   return (obs - avg) / std
-
-  # def get_citations_ids_map(id_list):
-#   #ids = ''
-#   #if (not isinstance(id_list, list)):
-#   print '============== ID LIST ================'
-#   print id_list
-#   #ids = ','.join(id_list)
-#   #print '============== IDS ================'
-#   #print ids
-#   #else:
-#    # ids = id_list
-#   linked = {}
-#   for i in range(0, len(id_list)):
-#     handle = Entrez.elink(dbfrom="pubmed", id=id_list[i], linkname="pubmed_pubmed")
-#     results = Entrez.read(handle)
-#     print '============== RESULTS ================'
-#     print results
-#     handle.close()
-#     link_year = {}
-#     for link in results[0]["LinkSetDb"][0]["Link"]:
-#       link_year[link["Id"]] = get_details_by_id(link["Id"])['PubmedArticle'][0]['PubmedData']['History'][0]['Year']
-#     linked[id_list[i]] = link_year
-
-#     print '============== LINKED ================'
-#     print linked
-#     print '============== ID ================'
-#     print id_list[i]
-#     #print linked
-#   return linked
