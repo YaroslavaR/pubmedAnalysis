@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.ticker as tick
 import numpy as np
+import logging
 from util import avg, avg_list
 from settings import SEARCH_TERM_1, SEARCH_TERM_2, MAX_RETURNED_TERM_1, MAX_RETURNED_TERM_2
 
@@ -75,8 +76,9 @@ def create_avg_citations_age_per_year_plot(term1_cit_map, term2_cit_map,
 
     plt.subplot(212).xaxis.set_major_formatter(
         tick.FormatStrFormatter('%0.0f'))
-    print(list(term1_age_of_cited_work.keys()))
-    print(avg_list(term1_age_of_cited_work.values()))
+
+    logging.debug(list(term1_age_of_cited_work.keys()))
+    logging.debug(avg_list(term1_age_of_cited_work.values()))
     ind_ai = np.arange(len(term1_age_of_cited_work))
     ind_ml = np.arange(len(term2_age_of_cited_work))
     plt.bar(ind_ai - 0.15,
@@ -106,13 +108,13 @@ def create_avg_citations_age_per_year_plot(term1_cit_map, term2_cit_map,
 
 def growth_rate(term_map, term):
     growth_rate = np.exp(np.diff(np.log(list(term_map.values())))) - 1
-    print(growth_rate)
+    logging.debug(growth_rate)
     x = np.array(list(term_map.keys()))
-    print(x)
+    logging.debug(x)
     growth_rate = np.insert(growth_rate, 0, 0)
-    print(growth_rate)
-    print(len(growth_rate))
-    print(len(x))
+    logging.debug(growth_rate)
+    logging.debug(len(growth_rate))
+    logging.debug(len(x))
 
     plt.figure(3)
     plt.subplot(111).xaxis.set_major_formatter(

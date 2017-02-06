@@ -1,3 +1,4 @@
+import logging
 from Bio import Entrez
 from settings import ENTREZ_EMAIL
 Entrez.email = ENTREZ_EMAIL
@@ -11,12 +12,12 @@ def lookup(query, max_returned):
         retmode='xml',
         term=query,
         usehistory="y")
-    print('========== HANDLE =======')
-    print(type(handle))
+    logging.debug('========== HANDLE =======')
+    logging.debug(type(handle))
     results = Entrez.read(handle)
-    print('=========== RESULTS =======')
-    print(type(results))
-    print(results)
+    logging.debug('=========== RESULTS =======')
+    logging.debug(type(results))
+    logging.debug(results)
     return results
 
 
@@ -38,15 +39,15 @@ def get_citations_ids(id_list, webenv):
             webenv=webenv)  #, query_key=query_key)
         results = Entrez.read(handle)
         handle.close()
-        print('============== RESULTS ================')
-        print(results)
-        print('====== LINKS BEFORE =========')
-        print(linked)
+        logging.debug('============== RESULTS ================')
+        logging.debug(results)
+        logging.debug('====== LINKS BEFORE =========')
+        logging.debug(linked)
         if len(results[0]["LinkSetDb"]) != 0:
             linked = linked + (
                 [link["Id"] for link in results[0]["LinkSetDb"][0]["Link"]])
-            print('====== LINKS AFTER =========')
-            print(linked)
+            logging.debug('====== LINKS AFTER =========')
+            logging.debug(linked)
     return linked
 
     # results = Entrez.read(Entrez.elink(dbfrom="pubmed", db="pmc", LinkName="pubmed_pmc_refs", id=ids[i:i+200]))

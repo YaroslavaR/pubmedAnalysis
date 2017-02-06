@@ -1,3 +1,5 @@
+import logging
+import sys
 from collections import OrderedDict
 from Bio import Entrez
 from queries import lookup, get_details_by_id, get_citations_ids
@@ -28,18 +30,24 @@ def create_maps(term, max_returned):
     results = lookup(term, max_returned)
     id_list = results['IdList']
     webenv = results["WebEnv"]
+    
     articles = get_details_by_id(id_list, webenv)
     articles_dict = create_articles_map(articles)
     cit_id_list = get_citations_ids(id_list, webenv)
     articles_links_dict = get_citations_ids_map(id_list, webenv)
-    citations = get_details_by_id(cit_id_list, webenv)
+    try: 
+      citations = get_details_by_id(cit_id_list, webenv)
+    except BaseException as e:
+      logging.exception('Failed to create relevant dictionaries for given term: cit_id_list=' + str(cit_id_list) + \
+        ' Exception: ' + str(e) + ' Please, try different search parameters - consider increasing max_returned values to 15.')
+      sys.exit('Program executed with errors - see log for details.')
     citations_dict = create_articles_map(citations)
     return articles_dict, articles_links_dict, citations_dict
 
 
 def get_citations_ids_map(id_list, webenv):
-    print('============== ID LIST ================')
-    print(id_list)
+    logging.debug('============== ID LIST ================')
+    logging.debug(id_list)
     linked = {}
     for i in range(0, len(id_list)):
         handle = Entrez.elink(
@@ -48,17 +56,17 @@ def get_citations_ids_map(id_list, webenv):
             linkname="pubmed_pubmed_refs",
             webenv=webenv)
         results = Entrez.read(handle)
-        print('============== RESULTS ================')
-        print(results)
+        logging.debug('============== RESULTS ================')
+        logging.debug(results)
         handle.close()
         if len(results[0]["LinkSetDb"]) != 0:
             linked[id_list[i]] = [
                 link["Id"] for link in results[0]["LinkSetDb"][0]["Link"]
             ]
-            print('============== LINKED ================')
-            print(linked)
-            print('============== ID ================')
-            print(id_list[i])
+            logging.debug('============== LINKED ================')
+            logging.debug(linked)
+            logging.debug('============== ID ================')
+            logging.debug(id_list[i])
     return linked
 
 
@@ -75,7 +83,7 @@ def create_article_year_by_topic_map(query_result):
 
 def create_articles_map(query_result):
     articles_map = {}
-    print(query_result)
+    logging.debug(query_result)
     for paper in query_result['PubmedArticle']:
         attributes_map = {}
         attributes_map['pub_year'] = paper['PubmedData']['History'][0]['Year']
@@ -88,8 +96,8 @@ def create_articles_map(query_result):
         attributes_map['pub_keywords'] = paper['MedlineCitation'][
             'KeywordList']
         articles_map[str(paper['MedlineCitation']['PMID'])] = attributes_map
-    print('=========    MAPMAPMAP     =========')
-    print(articles_map)
+    logging.debug('=========    MAPMAPMAP     =========')
+    logging.debug(articles_map)
     return articles_map
 
 
@@ -101,8 +109,8 @@ def create_article_year_by_topic_from_map(a_map):
             year_by_topic[year] = 1
         else:
             year_by_topic[year] += 1
-    print('=========    YEAR_BY_TOPIC_MAPMAPMAP     =========')
-    print(sort_map_by_keys(year_by_topic))
+    logging.debug('=========    YEAR_BY_TOPIC_MAPMAPMAP     =========')
+    logging.debug(sort_map_by_keys(year_by_topic))
     return sort_map_by_keys(year_by_topic)
 
 
@@ -126,20 +134,20 @@ def age_of_cited_work(art_map, art_cit_map, cit_map):
     age = {}
     for article in art_cit_map:
         age_list = []
-        print('========== ARTICLE ============')
-        print(article)
+        logging.debug('========== ARTICLE ============')
+        logging.debug(article)
         for citation in art_cit_map[article]:
-            print('========== CITATION ============')
-            print(citation)
-            print(art_map[article]['pub_year'])
+            logging.debug('========== CITATION ============')
+            logging.debug(citation)
+            logging.debug(art_map[article]['pub_year'])
             if citation in cit_map:
-                print(cit_map[citation]['pub_year'])
+                logging.debug(cit_map[citation]['pub_year'])
                 age_list.append(
                     int(art_map[article]['pub_year']) - int(cit_map[citation][
                         'pub_year']))
                 age[art_map[article]['pub_year']] = age_list
-                print('========== AGE ============')
-                print(age)
+                logging.debug('========== AGE ============')
+                logging.debug(age)
     return sort_map_by_keys(age)
 
 
@@ -149,7 +157,7 @@ def keywords_map(articles_map):
         if len(articles_map[article]['pub_keywords']) != 0:
             keyword_list = articles_map[article]['pub_keywords'][
                 0]  # for each element in articles_map[article]['pub_keywords'] list get keyword
-            print(keyword_list)
+            logging.debug(keyword_list)
             for keyword in keyword_list:
                 if not keyword.lower() in keywords_map:
                     keywords_map[str(keyword).lower()] = 1

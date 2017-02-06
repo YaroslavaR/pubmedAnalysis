@@ -1,3 +1,4 @@
+import logging
 import xlsxwriter
 from settings import OUTPUT_PATH
 
@@ -15,19 +16,19 @@ def create_keywords_excel(doc, keywords_map):
 
 
 def avg(slist):
-    print('========== DICT ============')
-    print(slist)
+    logging.debug('========== DICT ============')
+    logging.debug(slist)
     for i in range(0, len(slist)):
         slist[i] = float(slist[i]) / len(slist)
     return slist
 
 
 def avg_list(slist):
-    print('========== DICT ============')
-    print(slist)
+    logging.debug('========== DICT ============')
+    logging.debug(slist)
     rlist = []
     for elem in slist:
         rlist.append(sum(elem) / float(len(elem)))
     slist = rlist
-    print(slist)
+    logging.debug(slist)
     return slist
