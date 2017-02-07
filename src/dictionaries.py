@@ -1,5 +1,4 @@
 import logging
-import sys
 from collections import OrderedDict
 from Bio import Entrez
 from queries import lookup, get_details_by_id, get_citations_ids
@@ -35,12 +34,7 @@ def create_maps(term, max_returned):
     articles_dict = create_articles_map(articles)
     cit_id_list = get_citations_ids(id_list, webenv)
     articles_links_dict = get_citations_ids_map(id_list, webenv)
-    try: 
-      citations = get_details_by_id(cit_id_list, webenv)
-    except BaseException as e:
-      logging.exception('Failed to create relevant dictionaries for given term: cit_id_list=' + str(cit_id_list) + \
-        ' Exception: ' + str(e) + ' Please, try different search parameters - consider increasing max_returned values to 15.')
-      sys.exit('Program executed with errors - see log for details.')
+    citations = get_details_by_id(cit_id_list, webenv)
     citations_dict = create_articles_map(citations)
     return articles_dict, articles_links_dict, citations_dict
 

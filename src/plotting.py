@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as tick
 import numpy as np
 import logging
-from util import avg, avg_list
+from util import percentage, avg_list
 from settings import SEARCH_TERM_1, SEARCH_TERM_2, MAX_RETURNED_TERM_1, MAX_RETURNED_TERM_2
 
 
@@ -52,50 +52,45 @@ def create_amount_of_article_citations_per_year_plot(
     plt.show()
 
 
-def create_avg_citations_age_per_year_plot(term1_cit_map, term2_cit_map,
-                                           term1_age_of_cited_work,
+def create_avg_citations_age_per_year_plot(term1_age_of_cited_work,
                                            term2_age_of_cited_work):
     plt.figure(2, figsize=(10, 5))
     plt.subplot(211).xaxis.set_major_formatter(
         tick.FormatStrFormatter('%0.0f'))
-    plt.plot(
-        list(term1_cit_map.keys()),
-        avg(list(term1_cit_map.values())),
-        ':r',
-        label=SEARCH_TERM_2)
-    plt.plot(
-        list(term2_cit_map.keys()),
-        avg(list(term2_cit_map.values())),
-        '--c',
-        label=SEARCH_TERM_1)
-    plt.title("Average amount of article citations per year for " +
-              SEARCH_TERM_2 + " vs for " + SEARCH_TERM_1)
+    logging.debug(list(term1_age_of_cited_work.keys()))
+    logging.debug(avg_list(term1_age_of_cited_work.values()))
+    
+    ind_ml = np.arange(len(term1_age_of_cited_work))  
+    plt.bar(ind_ml,
+            avg_list(term1_age_of_cited_work.values()),
+            0.3,
+            color='r',
+            label=SEARCH_TERM_1)
+    plt.xticks(ind_ml, list(term1_age_of_cited_work.keys()))
+
+    plt.title("Average age of cited works per year for " + SEARCH_TERM_1)
     plt.xlabel("Year")
-    plt.ylabel("Average amount of articles")
+    plt.ylabel("Age of articles")
+
+    plt.tight_layout(pad=1.0, w_pad=1.0, h_pad=1.0)
+
     plt.legend(loc=2)
 
     plt.subplot(212).xaxis.set_major_formatter(
         tick.FormatStrFormatter('%0.0f'))
 
-    logging.debug(list(term1_age_of_cited_work.keys()))
-    logging.debug(avg_list(term1_age_of_cited_work.values()))
-    ind_ai = np.arange(len(term1_age_of_cited_work))
-    ind_ml = np.arange(len(term2_age_of_cited_work))
-    plt.bar(ind_ai - 0.15,
-            avg_list(term1_age_of_cited_work.values()),
-            0.3,
-            color='r',
-            label=SEARCH_TERM_2)
-    plt.bar(ind_ml + 0.15,
+    logging.debug(list(term2_age_of_cited_work.keys()))
+    logging.debug(avg_list(term2_age_of_cited_work.values()))
+    
+    ind_ml = np.arange(len(term2_age_of_cited_work))  
+    plt.bar(ind_ml,
             avg_list(term2_age_of_cited_work.values()),
             0.3,
             color='c',
-            label=SEARCH_TERM_1)
-    plt.xticks(ind_ai, list(term1_age_of_cited_work.keys()))
+            label=SEARCH_TERM_2)
     plt.xticks(ind_ml, list(term2_age_of_cited_work.keys()))
 
-    plt.title("Average age cited works per year for " + SEARCH_TERM_2 +
-              " vs for " + SEARCH_TERM_1)
+    plt.title("Average age of cited works per year for " + SEARCH_TERM_2)
     plt.xlabel("Year")
     plt.ylabel("Age of articles")
 
@@ -105,6 +100,19 @@ def create_avg_citations_age_per_year_plot(term1_cit_map, term2_cit_map,
     plt.savefig('output/avg_citations_age_per_year.png')
     plt.show()
 
+def percentage_per_year_pie(term_map, term):
+    labels = list(term_map.keys())
+    sizes = percentage(list(term_map.values()))
+
+    fig1, ax1 = plt.subplots(figsize=(10, 7.5))
+    ax1.pie(sizes, labels=labels, autopct='%1.1f%%',
+        shadow=True, startangle=90, labeldistance=1.2)
+    ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    plt.title("Percentage of article citations per year for " + term, y=1.08)
+    #plt.tight_layout(pad=1.0, w_pad=1.0, h_pad=2.0)
+
+    plt.savefig('output/percentage_per_year_pie_' + term + '.png')
+    plt.show()
 
 def growth_rate(term_map, term):
     growth_rate = np.exp(np.diff(np.log(list(term_map.values())))) - 1
@@ -119,6 +127,7 @@ def growth_rate(term_map, term):
     plt.figure(3)
     plt.subplot(111).xaxis.set_major_formatter(
         tick.FormatStrFormatter('%0.0f'))
-    plt.plot(x, growth_rate)
+    plt.plot(list(term_map.keys()), growth_rate)
+    plt.title("Growth trend for " + term + " per year")
     plt.savefig('output/growth_' + term + '.png')
     plt.show()

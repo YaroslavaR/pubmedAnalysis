@@ -15,12 +15,13 @@ def create_keywords_excel(doc, keywords_map):
     workbook.close()
 
 
-def avg(slist):
+def percentage(slist):
     logging.debug('========== DICT ============')
     logging.debug(slist)
+    rlist = []
     for i in range(0, len(slist)):
-        slist[i] = float(slist[i]) / len(slist)
-    return slist
+        rlist.append(round(((float(slist[i]) / sum(slist)) * 100), 2))
+    return rlist
 
 
 def avg_list(slist):
