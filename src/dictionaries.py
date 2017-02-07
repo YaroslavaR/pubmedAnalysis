@@ -127,7 +127,7 @@ def keywords_map(articles_map):
             logging.debug(keyword_list)
             for keyword in keyword_list:
                 if not keyword.lower() in keywords_map:
-                    keywords_map[str(keyword).lower()] = 1
+                    keywords_map[keyword.encode('ascii', 'ignore').lower()] = 1
                 else:
-                    keywords_map[str(keyword).lower()] += 1
+                    keywords_map[keyword.encode('ascii', 'ignore').lower()] += 1
     return keywords_map
