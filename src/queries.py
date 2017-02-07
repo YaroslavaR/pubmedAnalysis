@@ -1,11 +1,14 @@
 import logging
 import sys
 from Bio import Entrez
+from util import create_unverified_context
 from settings import ENTREZ_EMAIL
 Entrez.email = ENTREZ_EMAIL
 
 
 def lookup(query, max_returned):
+    """ Search for term in Entrez, return Entrez Parse object """
+    create_unverified_context()
     handle = Entrez.esearch(
         db='pubmed',
         sort='relevance',
@@ -20,9 +23,12 @@ def lookup(query, max_returned):
     return results
 
 
-def get_details_by_id(id_list, webenv):
+def get_details_by_id(id_list):
+    """ Search for detailed information for each id from id_list, 
+                        return Entrez Parse object """
+    create_unverified_context()
     ids = ','.join(id_list)
-    handle = Entrez.efetch(db='pubmed', retmode='xml', id=ids, webenv=webenv)
+    handle = Entrez.efetch(db='pubmed', retmode='xml', id=ids)
     try:
         results = Entrez.read(handle)
     except BaseException as e:
@@ -32,15 +38,15 @@ def get_details_by_id(id_list, webenv):
     return results
 
 
-def get_citations_ids(id_list, webenv='0'):
+def get_citations_ids(id_list):
+    """ Get ids of articles referenced by articles from id_list, return list """
+    create_unverified_context()
     ids = ','.join(id_list)
     linked = []
     for i in range(0, len(ids), 200):
         handle = Entrez.elink(
-        dbfrom="pubmed",
-        id=ids[i:i + 200],
-        linkname="pubmed_pubmed_refs"
-        , webenv=webenv)  #, query_key=query_key)
+            dbfrom="pubmed", id=ids[i:i + 200], linkname="pubmed_pubmed_refs")
+
         try:
             results = Entrez.read(handle)
         except BaseException as e:
@@ -48,7 +54,8 @@ def get_citations_ids(id_list, webenv='0'):
             ' Exception: ' + str(e) + ' Please, try different search parameters - consider increasing max_returned values to 15.')
             sys.exit('Program executed with errors - see log for details.')
         handle.close()
-        logging.debug('============== get_citations_ids RESULTS: ================')
+        logging.debug(
+            '============== get_citations_ids RESULTS: ================')
         logging.debug(results)
         if len(results[0]["LinkSetDb"]) != 0:
             linked = linked + (
@@ -56,12 +63,3 @@ def get_citations_ids(id_list, webenv='0'):
             logging.debug('====== REFERENCED ARTICLES: =========')
             logging.debug(linked)
     return linked
-
-    # results = Entrez.read(Entrez.elink(dbfrom="pubmed", db="pmc", LinkName="pubmed_pmc_refs", id=ids[i:i+200]))
-    # #handle.close()
-    # pmc_ids = [link["Id"] for link in results[0]["LinkSetDb"]]#[0]["Link"]]
-    # print '============== pmc_ids ================'
-    # print pmc_ids
-    # results2 = Entrez.read(Entrez.elink(dbfrom="pmc", db="pubmed", LinkName="pmc_pubmed", id=",".join(pmc_ids)))
-    # print '============== RESULTS2 ================'
-    # print results2

@@ -1,0 +1,30 @@
+<!doctype html><html><head><link href="rule.css" rel="stylesheet" type="text/css" /></head><body><h1><big>"pass" should not be used needlessly</big> (python:S2772)</h1><div class="rule-desc"><p>
+  The use of a <code>pass</code> statement where it's not required by the syntax is pure cruft and should be removed.
+</p>
+
+<h2>Noncompliant Code Example</h2>
+
+<pre>
+def __init__(self, log="", who="", date=0, files=[]):
+  self.log = log
+  self.files = files
+  self.who = who
+  self.date = date
+  pass    # Noncompliant
+
+def lookup():
+  pass    # Compliant; method can't be empty
+</pre>
+
+<h2>Compliant Solution</h2>
+
+<pre>
+def __init__(self, log="", who="", date=0, files=[]):
+  self.log = log
+  self.files = files
+  self.who = who
+  self.date = date
+
+def lookup():
+  pass
+</pre></div></body></html>

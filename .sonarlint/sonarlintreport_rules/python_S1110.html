@@ -1,0 +1,11 @@
+<!doctype html><html><head><link href="rule.css" rel="stylesheet" type="text/css" /></head><body><h1><big>Useless parentheses around expressions should be removed to prevent any misunderstanding</big> (python:S1110)</h1><div class="rule-desc"><p>Useless parentheses can sometimes be misleading and so should be removed.</p>
+
+<p>The following code snippet illustrates this rule:</p>
+
+<pre>
+return 3             # Compliant
+return (x)           # Non-Compliant
+return (x + 1)       # Non-Compliant
+x = (y / 2 + 1)      # Non-Compliant
+y = (4+X) * y;       # Compliant
+</pre></div></body></html>
