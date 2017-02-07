@@ -7,7 +7,12 @@ Entrez.email = ENTREZ_EMAIL
 
 
 def lookup(query, max_returned):
-    """ Search for term in Entrez, return Entrez Parse object """
+    """ 
+    Search for term in Entrez, return Entrez Parse object 
+
+    Using Entrez esearch method return object with ids
+    connected to specified query
+    """
     create_unverified_context()
     handle = Entrez.esearch(
         db='pubmed',
@@ -24,8 +29,13 @@ def lookup(query, max_returned):
 
 
 def get_details_by_id(id_list):
-    """ Search for detailed information for each id from id_list, 
-                        return Entrez Parse object """
+    """ 
+    Search for detailed information for each id from id_list, 
+                        return Entrez Parse object
+
+    Using Entrez efetch method return object which has detailed
+    data regarding each of the specified ids
+    """
     create_unverified_context()
     ids = ','.join(id_list)
     handle = Entrez.efetch(db='pubmed', retmode='xml', id=ids)
@@ -39,7 +49,14 @@ def get_details_by_id(id_list):
 
 
 def get_citations_ids(id_list):
-    """ Get ids of articles referenced by articles from id_list, return list """
+    """ 
+    Get ids of articles referenced by articles from id_list, return list 
+
+    Using Entrez elink method return object which holds ids referenced by
+    each of the ids in the id_list. Requests are sent in batches of 200 ids
+    to prevent timeouts.
+    Returns a list of ids of all referenced articles. 
+    """
     create_unverified_context()
     ids = ','.join(id_list)
     linked = []

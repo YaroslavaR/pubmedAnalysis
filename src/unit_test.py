@@ -117,8 +117,8 @@ class MyTest(unittest.TestCase):
         testdict = {'2014': 1, '1994': 10, '1995': 8, '2017': 2, '1986': 1}
         self.assertEqual(
             sort_map_by_keys(testdict),
-            OrderedDict([('1986', 1), ('1994', 10), ('1995', 8), ('2014', 1), (
-                '2017', 2)]))
+            OrderedDict([('1986', 1), ('1994', 10), ('1995', 8), ('2014', 1),
+                         ('2017', 2)]))
 
     def test_create_article_year_by_topic_from_map(self):
         """ Testing dictionaries.py create_article_year_by_topic_from_map """

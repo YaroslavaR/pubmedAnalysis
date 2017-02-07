@@ -124,7 +124,7 @@ def percentage_per_year_pie(term_map, term):
 
 
 def growth_rate(term_map, term):
-    """ Create a plot showing yearly growth trend """
+    """ Create a plot showing yearly growth trend for given term """
     growth_rate = np.exp(np.diff(np.log(list(term_map.values())))) - 1
     logging.debug(growth_rate)
     x = np.array(list(term_map.keys()))

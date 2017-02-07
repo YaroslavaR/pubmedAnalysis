@@ -8,7 +8,15 @@ Entrez.email = ENTREZ_EMAIL
 
 
 def create_maps(term, max_returned):
-    """ Execute Entrez queries and create dictionaries, return three dictionaries """
+    """ 
+    Execute Entrez queries and create dictionaries, return three dictionaries 
+
+    Method setting in motion most of the program's logic. Returns three
+    dictionaries: articles_dict - a dictionary containing detailed data about
+    articles; citations_dict - a dictionary containing detailed data about
+    citations; articles_links_dict - a dictionary representing the mappings of
+    article to the citations it references.
+    """
     results = lookup(term, max_returned)
     id_list = results['IdList']
 
@@ -22,8 +30,13 @@ def create_maps(term, max_returned):
 
 
 def get_citations_ids_map(id_list):
-    """ Create dictionary of articles mapped to articles they reference, 
-                        return dictionary """
+    """ 
+    Create dictionary of articles mapped to articles they reference, 
+                        return dictionary 
+
+    Returns a dictionary representing the mappings of
+    article to the citations it references.
+    """
     create_unverified_context()
     logging.debug('============== IN get_citations_ids_map: ================')
     logging.debug('============== ID LIST: ================')
@@ -48,7 +61,12 @@ def get_citations_ids_map(id_list):
 
 
 def create_articles_map(query_result):
-    """ Create articles dictionary, return dictionary """
+    """ 
+    Create articles dictionary, return dictionary 
+
+    Returns a dictionary containing detailed data about query_result - 
+    Entrez Parser object parsed to a regular Python dictionary.
+    """
     logging.debug('============== IN create_articles_map: ================')
     articles_map = {}
     logging.debug(query_result)
@@ -70,7 +88,12 @@ def create_articles_map(query_result):
 
 
 def create_article_year_by_topic_from_map(a_map):
-    """ Create year by topic dictionary, return ordered dictionary """
+    """ 
+    Create year by topic dictionary, return ordered dictionary 
+
+    Returns a dictionary containing information about the amount
+    of articles written in particular year.
+    """
     logging.debug(
         '============== IN create_article_year_by_topic_from_map: ================'
     )
@@ -94,7 +117,14 @@ def sort_map_by_keys(dictionary):
 
 
 def age_of_cited_work(art_map, art_cit_map, cit_map):
-    """ Create age of cited work dictionary, return dictionary """
+    """ 
+    Create age of cited work dictionary, return dictionary 
+
+    Calculates the ages of works cited by given article with
+    respect to the year the article was written - returns a 
+    dictionary mapping the year of article creation to the ages
+    of articles referenced by it.
+    """
     logging.debug('============== IN age_of_cited_work: ================')
     age = {}
     for article in art_cit_map:
@@ -129,5 +159,6 @@ def keywords_map(articles_map):
                 if not keyword.lower() in keywords_map:
                     keywords_map[keyword.encode('ascii', 'ignore').lower()] = 1
                 else:
-                    keywords_map[keyword.encode('ascii', 'ignore').lower()] += 1
+                    keywords_map[keyword.encode('ascii', 'ignore').lower(
+                    )] += 1
     return keywords_map

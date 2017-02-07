@@ -5,7 +5,11 @@ from settings import OUTPUT_PATH
 
 
 def create_keywords_excel(doc, keywords_map):
-    """ Write keywords_map to excel doc """
+    """ 
+    Write keywords_map to excel doc 
+
+    Write two columns - keyword in one, number of occurrences in second.
+    """
     workbook = xlsxwriter.Workbook(OUTPUT_PATH + '/' + doc)
     worksheet = workbook.add_worksheet()
     row = 0
@@ -40,6 +44,13 @@ def avg_list(slist):
 
 
 def create_unverified_context():
+    """
+    Create unverified context
+
+    Entrez has invalid SSL certificate - legacy Python does not verify HTTPS 
+    certificates by default, so this is not a problem, whereas Python v. > 3
+    does, and thus explicit unverified https context setting is required
+    """
     try:
         _create_unverified_https_context = ssl._create_unverified_context
     except AttributeError:
