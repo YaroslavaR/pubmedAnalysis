@@ -1,55 +1,15 @@
 from util import percentage, avg_list, create_keywords_excel
-from queries import lookup, get_citations_ids, get_details_by_id
 from dictionaries import age_of_cited_work, sort_map_by_keys, create_article_year_by_topic_from_map, keywords_map, \
-    get_citations_ids_map, create_articles_map, create_maps
-from settings import ENTREZ_EMAIL, OUTPUT_PATH
+    get_citations_ids_map
+from settings import OUTPUT_PATH
 from collections import OrderedDict
 from Bio.Entrez.Parser import StringElement, ListElement
-from Bio import Entrez
-import ssl, os
+import os
 import unittest
-Entrez.email = ENTREZ_EMAIL
 
 
-class MyTest(unittest.TestCase):
-    def test_lookup(self):
-        """ Testing queries.py lookup """
-        term = 'artificial intelligence'
-        result = lookup(term, 10)
-        self.assertTrue(isinstance(result, dict))
-        self.assertIn('IdList', result)
-        self.assertTrue(len(result['IdList']) > 5)
 
-    def test_get_details_by_id(self):
-        """ Testing queries.py get_details_by_id """
-        article_id = ['21876725']
-        result = get_details_by_id(article_id)
-        self.assertTrue(isinstance(result, dict))
-        self.assertIn('PubmedArticle', result)
-        self.assertEqual(result['PubmedArticle'][0]['MedlineCitation']['PMID'],
-                         '21876725')
-
-    def test_get_details_by_id_exception(self):
-        """ Testing queries.py get_details_by_id """
-        article_id = []
-        with self.assertRaises(BaseException) as context:
-            get_details_by_id(article_id)
-            self.assertTrue(
-                'Please, try different search parameters' in context.exception)
-
-    def test_get_citations_ids(self):
-        """ Testing queries.py get_citations_ids """
-        article_id = ['21876725']
-        citations_list = ['19906066', '18202288']
-        self.assertEqual(get_citations_ids(article_id), citations_list)
-
-    def test_get_citations_ids_exception(self):
-        """ Testing queries.py get_citations_ids """
-        article_id = []
-        with self.assertRaises(BaseException) as context:
-            get_citations_ids(article_id)
-            self.assertTrue(
-                'Supplied id parameter is empty' in context.exception)
+class UnitTest(unittest.TestCase):
 
     def test_get_citations_ids_map(self):
         """ Testing dictionaries.py get_citations_ids_map """
@@ -57,15 +17,6 @@ class MyTest(unittest.TestCase):
         article_citations_dict = {'21876725': ['19906066', '18202288']}
         self.assertEqual(
             get_citations_ids_map(article_id), article_citations_dict)
-
-    def test_create_articles_map(self):
-        """ Testing dictionaries.py create_articles_map """
-        article_id = ['21876725']
-        result = get_details_by_id(article_id)
-        testdict = create_articles_map(result)
-        self.assertTrue(isinstance(testdict, dict))
-        self.assertEqual(testdict['21876725']['pub_title'],
-                         'Valuing ecological systems and services.')
 
     def test_age_of_cited_work(self):
         """ Testing dictionaries.py age_of_cited_work """
@@ -212,16 +163,6 @@ class MyTest(unittest.TestCase):
                 'nursing informatics': 1
             })
 
-    def test_create_maps(self):
-        """ Testing dictionaries.py create_maps """
-        art_dic, art_cit_dic, cit_dic = create_maps('artificial intelligence',
-                                                    30)
-        self.assertTrue(isinstance(art_dic, dict))
-        self.assertTrue(isinstance(art_cit_dic, dict))
-        self.assertTrue(isinstance(cit_dic, dict))
-        self.assertIn(list(art_cit_dic.keys())[0], art_dic)
-        self.assertIn(list(art_cit_dic.values())[0][0], cit_dic)
-
     def test_avg_list(self):
         """ Testing util.py avg_list """
         testlist = [[2, 3, 4, 2, 3], [2, 3, 4, 2, 3]]
@@ -233,7 +174,6 @@ class MyTest(unittest.TestCase):
         self.assertEqual(
             percentage(testlist), [14.29, 21.43, 28.57, 14.29, 21.43])
 
-    @staticmethod
     def test_create_keywords_excel(self):
         """ Testing util.py create_keywords_excel """
         testdict = {
@@ -241,8 +181,9 @@ class MyTest(unittest.TestCase):
             'history of science': 1,
             'literature review': 2
         }
-        create_keywords_excel('output', testdict)
-        assert os.path.exists(OUTPUT_PATH + '/output') == 1
+        file = 'test.xlsx'
+        create_keywords_excel(file, testdict)
+        assert os.path.exists(OUTPUT_PATH + '/' + file) == 1
 
 
 if __name__ == '__main__':

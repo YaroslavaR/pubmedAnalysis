@@ -15,7 +15,7 @@ def create_keywords_excel(doc, keywords_map):
     row = 0
     col = 0
     for key in keywords_map.keys():
-        worksheet.write(row, col, key.decode())
+        worksheet.write(row, col, key)
         worksheet.write(row, col + 1, keywords_map[key])
         row += 1
     workbook.close()
