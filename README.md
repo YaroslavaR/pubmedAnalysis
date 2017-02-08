@@ -1,11 +1,13 @@
 # Pubmed Analysis 
-## Program for comparing trends and applications of two search terms in Bioinformatics terms.
-## Generates 6 png files (8 plots) and 2 xlxs files containing keywords related to search terms.
+Program for comparing trends and applications of two search terms in Bioinformatics domain.
+Generates 6 png files (8 plots) and 2 xlsx files containing keywords related to specified search terms.
 
 ## Usage:
-    ```python3 src/pubmed.py```
+    python3 src/pubmed.py
+
     or
-    ```python src/pubmed.py```
+
+    python src/pubmed.py
 
 ## Make sure to set relevant search parameters in **src/settings.py** file
 Name | Default value | Description
